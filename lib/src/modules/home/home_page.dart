@@ -15,11 +15,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with Loader, Messages {
   @override
   Widget build(BuildContext context) {
-    return BaseLayout(
+    return 
    
-      body: Container(
+       Container(
         child: Center(child: Text(Env.instance.get('backend_base_url'))),
-      ),
+      
     );
   }
 }
