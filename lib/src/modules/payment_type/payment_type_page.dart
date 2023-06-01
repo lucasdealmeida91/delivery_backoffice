@@ -60,6 +60,15 @@ class _PaymentTypePageState extends State<PaymentTypePage>
             widget._controller.loadPayments();
             showSuccess('Metodo salvo com sucesso');
             break;
+             case PaymentTypeStateStatus.errorOnsave:
+            hideLoader();
+             Navigator.of(context, rootNavigator: true).pop();
+            showError(
+              widget._controller.errorMessage ??
+                  'Erro ao buscar formas de pagamento',
+            );
+
+            break;
         }
       });
       disposers.addAll([statusDisposer, filterDisposer]);

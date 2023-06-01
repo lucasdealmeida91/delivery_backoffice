@@ -13,7 +13,8 @@ enum PaymentTypeStateStatus {
   loaded,
   error,
   addOrUpdatePayment,
-  saved;
+  saved,
+  errorOnsave;
 }
 
 class PaymentTypeController = _PaymentTypeControllerBase
@@ -78,18 +79,19 @@ abstract class _PaymentTypeControllerBase with Store {
     required bool enabled,
   }) async {
     try {
-  _status= PaymentTypeStateStatus.loading;
-  final paymentTypeModel = PaymentTypeModel(
-    id: id,
-    name: name,
-    acronym: acronym,
-    enabled: enabled,
-  );
-  _paymentTypeRepository.save(paymentTypeModel);
-  _status= PaymentTypeStateStatus.saved;
-} catch (e,s) {
-  
-}
-
+      _status = PaymentTypeStateStatus.loading;
+      final paymentTypeModel = PaymentTypeModel(
+        id: id,
+        name: name,
+        acronym: acronym,
+        enabled: enabled,
+      );
+      _paymentTypeRepository.save(paymentTypeModel);
+      _status = PaymentTypeStateStatus.saved;
+    } catch (e, s) {
+      log('Erro ao salvar as formas de pagamento', error: e, stackTrace: s);
+      _errorMessage = 'Erro ao salvar as formas de pagamento';
+      _status = PaymentTypeStateStatus.errorOnsave;
+    }
   }
 }
