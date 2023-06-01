@@ -4,6 +4,7 @@ import 'package:mobx/mobx.dart';
 import '../../core/ui/helpers/loader.dart';
 import '../../core/ui/helpers/messages.dart';
 import './payment_type_controller.dart';
+import 'widgets/payment_type_form/payment_type_form_modal.dart';
 import 'widgets/payment_type_header.dart';
 import 'widgets/payment_type_item.dart';
 
@@ -26,6 +27,10 @@ class _PaymentTypePageState extends State<PaymentTypePage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final filterDisposer =
+          reaction((_) => widget._controller.filterEnabled, (_) {
+        widget._controller.loadPayments();
+      });
       final statusDisposer =
           reaction((_) => widget._controller.status, (status) {
         switch (status) {
@@ -45,15 +50,50 @@ class _PaymentTypePageState extends State<PaymentTypePage>
             );
 
             break;
+          case PaymentTypeStateStatus.addOrUpdatePayment:
+            hideLoader();
+            showAddOrUpdatePayment();
+            break;
+          case PaymentTypeStateStatus.saved:
+            hideLoader();
+            Navigator.of(context, rootNavigator: true).pop();
+            widget._controller.loadPayments();
+            showSuccess('Metodo salvo com sucesso');
+            break;
         }
       });
-      disposers.addAll([statusDisposer]);
+      disposers.addAll([statusDisposer, filterDisposer]);
+      widget._controller.loadPayments();
     });
+  }
+
+  void showAddOrUpdatePayment() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Material(
+          color: Colors.black26,
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            backgroundColor: Colors.white,
+            elevation: 10,
+            child: PaymentTypeFormModal(
+              controller: widget._controller,
+              model: widget._controller.paymentTypeSelected,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
-    disposers;
+    for (final dispose in disposers) {
+      dispose();
+    }
     super.dispose();
   }
 
@@ -64,15 +104,10 @@ class _PaymentTypePageState extends State<PaymentTypePage>
       padding: const EdgeInsets.only(left: 40, top: 40, right: 40),
       child: Column(
         children: [
-          const PaymentTypeHeader(),
+          PaymentTypeHeader(controller: widget._controller),
           const SizedBox(
             height: 50,
           ),
-          ElevatedButton(
-              onPressed: () {
-                widget._controller.loadPayments();
-              },
-              child: Text('data')),
           Expanded(
             child: Observer(
               builder: (_) {
@@ -87,6 +122,7 @@ class _PaymentTypePageState extends State<PaymentTypePage>
                     final paymentTypeModel =
                         widget._controller.paymentTypes[index];
                     return PaymentTypeItem(
+                      controller: widget._controller,
                       payment: paymentTypeModel,
                     );
                   },
