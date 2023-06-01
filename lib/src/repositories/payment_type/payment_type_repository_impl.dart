@@ -39,7 +39,8 @@ class PaymentTypeRepositoryImpl implements PaymentTypeRepository {
     } on DioError catch (e, s) {
       log('Erro ao buscar forma de pagamento $id', error: e, stackTrace: s);
       throw RepositoryExcception(
-          message: 'Erro ao buscar forma de pagamento com id: $id');
+        message: 'Erro ao buscar forma de pagamento com id: $id',
+      );
     }
   }
 

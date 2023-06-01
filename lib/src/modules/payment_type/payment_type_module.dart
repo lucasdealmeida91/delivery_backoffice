@@ -5,7 +5,7 @@ import './payment_type_page.dart';
 class PaymentTypeModule extends Module {
     @override
     final List<Bind> binds = [
-      Bind.lazySingleton((i) => PaymentTypeController()),
+      Bind.lazySingleton((i) => PaymentTypeController(i())),
     ];
  
     @override
