@@ -11,7 +11,7 @@ class ProductsModule extends Module {
         Bind.lazySingleton(
           (i) => ProductsController(i()),
         ),
-         Bind.lazySingleton(
+        Bind.lazySingleton(
           (i) => ProductDetailController(i()),
         ),
       ];
@@ -21,8 +21,8 @@ class ProductsModule extends Module {
         ChildRoute('/', child: (context, args) => const ProductsPage()),
         ChildRoute(
           '/detail',
-          child: (context, args) => const ProductDetailPage(
-            productId: null,
+          child: (context, args) => ProductDetailPage(
+            productId: int.tryParse(args.queryParams['id'] ?? 'não informado'),
           ),
         ),
       ];

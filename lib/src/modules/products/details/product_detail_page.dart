@@ -7,6 +7,7 @@ import 'package:mobx/mobx.dart';
 import 'package:validatorless/validatorless.dart';
 
 import '../../../core/env/env.dart';
+import '../../../core/extensions/formatter_extensions.dart';
 import '../../../core/ui/helpers/loader.dart';
 import '../../../core/ui/helpers/messages.dart';
 import '../../../core/ui/helpers/size_extensions.dart';
@@ -45,28 +46,33 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             showLoader();
             break;
           case ProductsDetailStateStatus.loaded:
+            final model = controller.productModel!;
+            _nameEC.text = model.name;
+            _priceEC.text = model.price.currencyPTBR;
+            _descriptionEC.text = model.description;
             hideLoader();
+
             break;
           case ProductsDetailStateStatus.error:
             hideLoader();
             showError(controller.errorMessage!);
             break;
-          case ProductsDetailStateStatus.deleted:
-            hideLoader();
-            showError('Erro ao buscar produtos');
-            break;
           case ProductsDetailStateStatus.errorLoadProduct:
+            hideLoader();
+            showError(controller.errorMessage!);
+            Navigator.of(context).pop();
             break;
           case ProductsDetailStateStatus.uploaded:
             hideLoader();
-
             break;
+          case ProductsDetailStateStatus.deleted:
           case ProductsDetailStateStatus.saved:
             hideLoader();
             Navigator.pop(context);
             break;
         }
       });
+      controller.loadProduct(widget.productId);
     });
   }
 
@@ -210,15 +216,48 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                         padding: const EdgeInsets.all(5),
                         width: widthButtonAction / 2,
                         height: 60,
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.red),
-                          ),
-                          child: Text(
-                            'Deletar',
-                            style: context.textStyles.textBold
-                                .copyWith(color: Colors.red),
+                        child: Visibility(
+                          visible: widget.productId != null,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('confirmar'),
+                                    content: Text(
+                                        'Confirma a exclusão do produto ${controller.productModel!.name}'),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            'Cancelar',
+                                            style: context.textStyles.textBold
+                                                .copyWith(color: Colors.red),
+                                          )),
+                                      TextButton(
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          await controller.deleteProduct();
+                                        },
+                                        child: Text('Confirmar',
+                                            style: context.textStyles.textBold),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.red),
+                            ),
+                            child: Text(
+                              'Deletar',
+                              style: context.textStyles.textBold
+                                  .copyWith(color: Colors.red),
+                            ),
                           ),
                         ),
                       ),
