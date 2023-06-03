@@ -14,7 +14,7 @@ class BaseHeader extends StatelessWidget {
     super.key,
     required this.title,
     this.searchChange,
-    required this.buttonLabel,
+    this.buttonLabel = '',
     this.buttonPressed,
     this.addButton = true,
     this.filterWidget,
@@ -51,7 +51,7 @@ class BaseHeader extends StatelessWidget {
             ),
             Container(
               width: constrains.maxWidth * .65,
-              padding:const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: Text(
                 title,
                 textAlign: TextAlign.center,
@@ -65,8 +65,7 @@ class BaseHeader extends StatelessWidget {
               visible: addButton,
               child: SizedBox(
                 height: 48,
-                    width: constrains.maxWidth * .15,
-            
+                width: constrains.maxWidth * .15,
                 child: OutlinedButton.icon(
                   onPressed: buttonPressed,
                   icon: Icon(
